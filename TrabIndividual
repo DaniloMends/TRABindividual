@@ -1,0 +1,65 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct p {
+float x;
+float y;
+};
+
+float calcular_area(struct p vertices[], int num_vertices) {
+float area = 0;
+
+    for (int i = 0; i < num_vertices - 2; i++) {
+        float matriz[3][3] = {
+            {vertices[0].x, vertices[0].y, 1},
+            {vertices[i + 1].x, vertices[i + 1].y, 1},
+            {vertices[i + 2].x, vertices[i + 2].y, 1}
+        };
+
+        float d = 0;
+        d += (matriz[0][0] * matriz[1][1] * matriz[2][2]);
+        d += (matriz[0][1] * matriz[1][2] * matriz[2][0]);
+        d += (matriz[0][2] * matriz[1][0] * matriz[2][1]);
+        d -= (matriz[2][0] * matriz[1][1] * matriz[0][2]);
+        d -= (matriz[2][1] * matriz[1][2] * matriz[0][0]);
+        d -= (matriz[2][2] * matriz[1][0] * matriz[0][1]);
+
+        area += d / 2;
+    }
+
+    if (area < 0) {
+        area = -area;
+    }
+
+    return area;
+}
+
+int main() {
+    FILE *arquivo;
+    int num_vertices;
+    float x, y;
+
+    arquivo = fopen("poligono.txt", "r");
+
+    if (arquivo == NULL) {
+        printf("Não foi possível acessar o arquivo.\n");
+        exit(1);
+    }
+
+    fscanf(arquivo, "%d", &num_vertices);
+    struct p vertices[num_vertices];
+
+    for (int i = 0; i < num_vertices; i++) {
+        fscanf(arquivo, "%f %f", &x, &y);
+        vertices[i].x = x;
+        vertices[i].y = y;
+    }
+
+    float area = calcular_area(vertices, num_vertices);
+
+    printf("Área: %.2f", area);
+
+    fclose(arquivo);
+
+    return 0;
+}
